@@ -1,143 +1,302 @@
-// Ionic Starter App
+  var app = angular.module('app.example', [
+    'angular-meteor',
+    'ui.router',
+    'ionic',
+    'ngCordova.plugins.datePicker']);
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-angular.module('starter', ['angular-meteor', 'ionic', 'leaflet-directive', 'ngCordova', 'igTruncate'])
+  function onReady() {
+    angular.bootstrap(document, ['app.example']);
+  }
 
-  .run(function($ionicPlatform) {
-    $ionicPlatform.ready(function() {
-      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-      // for form inputs)
-      if(window.cordova && window.cordova.plugins.Keyboard) {
-        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        window.cordova.plugins.Keyboard.disableScroll(true);
-      }
-      if(window.StatusBar) {
-        StatusBar.styleDefault();
-      }
-    });
-  })
+  if (Meteor.isCordova) {
+    angular.element(document).on("deviceready", onReady);
+  }
+  else {
+    angular.element(document).ready(onReady);
+  }
+  Meteor.subscribe('Fields');
+/*
+  app.config(['$urlRouterProvider', '$stateProvider',
+    function($urlRouterProvider, $stateProvider){
 
-  .config(function($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise("/tabs");
+
     $stateProvider
+      .state('tabs', {
+        url : '/tabs',
+        templateUrl: 'index.ng.html',
+        controller: 'TodoCtrl'
+      });
+  }]);
 
-      .state('app', {
-        url: "/app",
+
+  // subscribe to the two collections we use
+  Meteor.subscribe('Projects');
+  Meteor.subscribe('Tasks');
+
+  app.controller('TodoCtrl', ['$scope', '$meteorCollection', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
+    function ($scope, $meteorCollection, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+
+      $scope.Projects = $meteorCollection(Projects);
+      $scope.Tasks = $meteorCollection(Tasks);
+
+      // A utility function for creating a new project
+      // with the given projectTitle
+      var createProject = function (projectTitle) {
+        var newProject = {
+          title: projectTitle,
+          active: false
+        };
+        $scope.Projects.save(newProject).then(function(res) {
+          if (res) {
+            $scope.selectProject(newProject, $scope.Projects.length - 1);
+          }
+        });
+      };
+
+      // Called to create a new project
+      $scope.newProject = function () {
+        $ionicPopup.prompt({
+          title: 'New Project',
+          subTitle: 'Name:'
+        }).then(function(res) {
+          if (res) {
+            createProject(res);
+          }
+        });
+      };
+
+      // Grab the last active, or the first project
+      $scope.activeProject = function () {
+        var activeProject = $scope.Projects[0];
+        angular.forEach($scope.Projects, function (v, k) {
+          if (v.active) {
+            activeProject = v;
+          }
+        });
+        return activeProject;
+      };
+
+      // Called to select the given project
+      $scope.selectProject = function (project, index) {
+        var selectedProject = $scope.Projects[index];
+        angular.forEach($scope.Projects, function (v, k) {
+          v.active = false;
+        });
+        selectedProject.active = true;
+        $ionicSideMenuDelegate.toggleLeft();
+      };
+
+      // Create our modal
+      $ionicModal.fromTemplateUrl('new-task.ng.html', function (modal) {
+        $scope.taskModal = modal;
+      }, {
+        scope: $scope,
+        animation: 'slide-in-up'
+      });
+
+      //Cleanup the modal when we are done with it!
+      $scope.$on('$destroy', function() {
+        $scope.taskModal.remove();
+      });
+
+      $scope.createTask = function (task) {
+        var activeProject = $scope.activeProject();
+        if (!activeProject || !task.title) {
+          return;
+        }
+
+        $scope.Tasks.save({
+          project: activeProject._id,
+          title: task.title
+        });
+
+        $scope.taskModal.hide();
+
+        task.title = "";
+      };
+
+      $scope.deleteTask = function (task) {
+        $scope.Tasks.delete(task);
+      };
+
+      $scope.newTask = function () {
+        $scope.task = {};
+        $scope.taskModal.show();
+      };
+
+      $scope.closeNewTask = function () {
+        $scope.taskModal.hide();
+      };
+
+      $scope.toggleProjects = function () {
+        $ionicSideMenuDelegate.toggleLeft();
+      };
+
+      $scope.pickDate = function(task) {
+        var options = {date: new Date(), mode: 'date'};
+        //var options = {date: new Date(), mode: 'time'}; for time
+        $cordovaDatePicker.show(options).then(function(date){
+          task.date = date;
+        });
+      }
+    }
+  ]);
+*/
+
+  app.config(['$urlRouterProvider', '$stateProvider',
+    function($urlRouterProvider, $stateProvider){
+
+    $urlRouterProvider.otherwise("/tab/fields");
+    $stateProvider
+      .state('tabs', {
+        url: "/tab",
         abstract: true,
-        templateUrl: "/client/menu.ng.html",
-        controller: 'MapController'
+        templateUrl: "client/templates/index.ng.html"
       })
-
-      .state('app.map', {
-        url: "/map",
+      .state('tabs.fields', {
+        url: "/fields",
         views: {
-          'menuContent' :{
-            templateUrl: "/client/map.ng.html"
+          'fields-tab': {
+            templateUrl: "client/templates/fields.ng.html",
+            controller: 'FieldsTabCtrl'
           }
         }
       })
-
-    $urlRouterProvider.otherwise('/app/map');
-
-  });
-
-
-angular.module('starter').factory('LocationsService', [ function() {
-
-  var locationsObj = {};
-
-  locationsObj.savedLocations = [
-    {
-      name : "Washington D.C., USA",
-      lat : 38.8951100,
-      lng : -77.0363700
-    },
-    {
-      name : "London, England",
-      lat : 51.500152,
-      lng : -0.126236
-    },
-    {
-      name : "Paris, France",
-      lat : 48.864716,
-      lng : 2.349014
-    },
-    {
-      name : "Moscow, Russia",
-      lat : 55.752121,
-      lng : 37.617664
-    },
-    {
-      name : "Rio de Janeiro, Brazil",
-      lat : -22.970722,
-      lng : -43.182365
-    },
-    {
-      name : "Sydney, Australia",
-      lat : -33.865143,
-      lng : 151.209900
-    }
-
-  ];
-
-  return locationsObj;
-
-}]);
-
-angular.module('starter').factory('InstructionsService', [ function() {
-
-  var instructionsObj = {};
-
-  instructionsObj.instructions = {
-    newLocations : {
-      text : 'To add a new location, tap and hold on the map',
-      seen : false
-    }
-  };
-
-  return instructionsObj;
-
-}]);
-angular.module('starter').controller('MapController',
-  [ '$scope',
-    '$cordovaGeolocation',
-    '$stateParams',
-    '$ionicModal',
-    '$ionicPopup',
-    'LocationsService',
-    'InstructionsService',
-    function(
-      $scope,
-      $cordovaGeolocation,
-      $stateParams,
-      $ionicModal,
-      $ionicPopup,
-      LocationsService,
-      InstructionsService
-      ) {
-
-      /**
-       * Once state loaded, get put map on scope.
-       */
-      $scope.$on("$stateChangeSuccess", function() {
-
-        $scope.locations = LocationsService.savedLocations;
-        $scope.newLocation;
-
-        if(!InstructionsService.instructions.newLocations.seen) {
-
-          var instructionsPopup = $ionicPopup.alert({
-            title: 'Add Locations',
-            template: InstructionsService.instructions.newLocations.text
-          });
-          instructionsPopup.then(function(res) {
-            InstructionsService.instructions.newLocations.seen = true;
-            });
-
+      .state('tabs.fieldDetails', {
+        url: "/fields/:fieldId",
+        views: {
+          'fields-tab': {
+            templateUrl: "client/templates/fieldDetails.ng.html",
+            controller: 'FieldDetailsTabCtrl'
+          }
         }
+      })
+      .state('tabs.addField', {
+        url: "/addField",
+        views: {
+          'fields-tab': {
+            templateUrl: "client/templates/addField.ng.html",
+            controller: 'AddFieldTabCtrl'
+          }
+        }
+      })
+      .state('tabs.insurance', {
+        url: "/insurance",
+        views: {
+          'insurance-tab': {
+            templateUrl: "client/templates/insurance.ng.html"
+          }
+        }
+      })
+      .state('tabs.profile', {
+        url: "/profile",
+        views: {
+          'profile-tab': {
+            templateUrl: "client/templates/profile.ng.html"
+          }
+        }
+      });
 
-        $scope.map = {
+
+/*
+    $stateProvider
+      .state('tabs', {
+        url : '/tabs',
+        templateUrl: 'index.ng.html',
+        controller: 'TodoCtrl'
+      });*/
+  }]);
+
+/*
+app.config(function($stateProvider, $urlRouterProvider) {
+
+  $stateProvider
+    .state('tabs', {
+      url: "/tab",
+      abstract: true,
+      templateUrl: "templates/tabs.html"
+    })
+    .state('tabs.home', {
+      url: "/home",
+      views: {
+        'home-tab': {
+          templateUrl: "templates/home.html",
+          controller: 'HomeTabCtrl'
+        }
+      }
+    })
+    .state('tabs.facts', {
+      url: "/facts",
+      views: {
+        'home-tab': {
+          templateUrl: "templates/facts.html"
+        }
+      }
+    })
+    .state('tabs.facts2', {
+      url: "/facts2",
+      views: {
+        'home-tab': {
+          templateUrl: "templates/facts2.html"
+        }
+      }
+    })
+    .state('tabs.about', {
+      url: "/about",
+      views: {
+        'about-tab': {
+          templateUrl: "templates/about.html"
+        }
+      }
+    })
+    .state('tabs.navstack', {
+      url: "/navstack",
+      views: {
+        'about-tab': {
+          templateUrl: "templates/nav-stack.html"
+        }
+      }
+    })
+    .state('tabs.contact', {
+      url: "/contact",
+      views: {
+        'contact-tab': {
+          templateUrl: "templates/contact.html"
+        }
+      }
+    });
+
+
+   $urlRouterProvider.otherwise("/tab/home");
+
+})
+*/
+/*
+app.controller('FieldTabCtrl', function($scope) {
+  console.log('FieldTabCtrl');
+});*/
+
+  app.controller('FieldsTabCtrl', ['$scope', '$meteorCollection', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
+    function ($scope, $meteorCollection, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+
+      $scope.Fields = $meteorCollection(Fields);
+      //console.log($scope.Fields);
+   }
+  ]);
+
+  app.controller('FieldDetailsTabCtrl', ['$scope', '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
+    function ($scope, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+      $scope.field = $meteor.object(Fields, $stateParams.fieldId);
+      //console.log($scope.Fields);
+   }
+  ]);
+
+ app.controller('AddFieldTabCtrl', ['$scope', '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
+    function ($scope, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+      //$scope.field = $meteor.object(Fields, $stateParams.fieldId);
+      //console.log($scope.Fields);
+      $scope.map = {
           defaults: {
             tileLayer: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
             maxZoom: 18,
@@ -150,93 +309,8 @@ angular.module('starter').controller('MapController',
               logic: 'emit'
             }
           }
-        };
+        };      
+   }
+  ]);
 
-        $scope.goTo(0);
-
-      });
-
-      var Location = function() {
-        if ( !(this instanceof Location) ) return new Location();
-        this.lat  = "";
-        this.lng  = "";
-        this.name = "";
-      };
-
-      $ionicModal.fromTemplateUrl('templates/addLocation.html', {
-        scope: $scope,
-        animation: 'slide-in-up'
-      }).then(function(modal) {
-          $scope.modal = modal;
-        });
-
-      /**
-       * Detect user long-pressing on map to add new location
-       */
-      $scope.$on('leafletDirectiveMap.contextmenu', function(event, locationEvent){
-        $scope.newLocation = new Location();
-        $scope.newLocation.lat = locationEvent.leafletEvent.latlng.lat;
-        $scope.newLocation.lng = locationEvent.leafletEvent.latlng.lng;
-        $scope.modal.show();
-      });
-
-      $scope.saveLocation = function() {
-        LocationsService.savedLocations.push($scope.newLocation);
-        $scope.modal.hide();
-        $scope.goTo(LocationsService.savedLocations.length - 1);
-      };
-
-      /**
-       * Center map on specific saved location
-       * @param locationKey
-       */
-      $scope.goTo = function(locationKey) {
-
-        var location = LocationsService.savedLocations[locationKey];
-
-        $scope.map.center  = {
-          lat : location.lat,
-          lng : location.lng,
-          zoom : 12
-        };
-
-        $scope.map.markers[locationKey] = {
-          lat:location.lat,
-          lng:location.lng,
-          message: location.name,
-          focus: true,
-          draggable: false
-        };
-
-      };
-
-      /**
-       * Center map on user's current position
-       */
-      $scope.locate = function(){
-
-        $cordovaGeolocation
-          .getCurrentPosition()
-          .then(function (position) {
-            $scope.map.center.lat  = position.coords.latitude;
-            $scope.map.center.lng = position.coords.longitude;
-            $scope.map.center.zoom = 15;
-
-            $scope.map.markers.now = {
-              lat:position.coords.latitude,
-              lng:position.coords.longitude,
-              message: "You Are Here",
-              focus: true,
-              draggable: false
-            };
-
-          }, function(err) {
-            // error
-            console.log("Location error!");
-            console.log(err);
-          });
-
-      };
-
-    }]);
-
+  

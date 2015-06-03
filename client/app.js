@@ -1,3 +1,104 @@
+// Ionic Starter App
+
+// angular.module is a global place for creating, registering and retrieving Angular modules
+// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
+// the 2nd parameter is an array of 'requires'
+angular.module('starter', ['angular-meteor', 'ionic', 'leaflet-directive', 'ngCordova', 'igTruncate'])
+
+  .run(function($ionicPlatform) {
+    $ionicPlatform.ready(function() {
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      if(window.cordova && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        window.cordova.plugins.Keyboard.disableScroll(true);
+      }
+      if(window.StatusBar) {
+        StatusBar.styleDefault();
+      }
+    });
+  })
+
+  .config(function($stateProvider, $urlRouterProvider) {
+    $stateProvider
+
+      .state('app', {
+        url: "/app",
+        abstract: true,
+        templateUrl: "/client/menu.ng.html",
+        controller: 'MapController'
+      })
+
+      .state('app.map', {
+        url: "/map",
+        views: {
+          'menuContent' :{
+            templateUrl: "/client/map.ng.html"
+          }
+        }
+      })
+
+    $urlRouterProvider.otherwise('/app/map');
+
+  });
+
+
+angular.module('starter').factory('LocationsService', [ function() {
+
+  var locationsObj = {};
+
+  locationsObj.savedLocations = [
+    {
+      name : "Washington D.C., USA",
+      lat : 38.8951100,
+      lng : -77.0363700
+    },
+    {
+      name : "London, England",
+      lat : 51.500152,
+      lng : -0.126236
+    },
+    {
+      name : "Paris, France",
+      lat : 48.864716,
+      lng : 2.349014
+    },
+    {
+      name : "Moscow, Russia",
+      lat : 55.752121,
+      lng : 37.617664
+    },
+    {
+      name : "Rio de Janeiro, Brazil",
+      lat : -22.970722,
+      lng : -43.182365
+    },
+    {
+      name : "Sydney, Australia",
+      lat : -33.865143,
+      lng : 151.209900
+    }
+
+  ];
+
+  return locationsObj;
+
+}]);
+
+angular.module('starter').factory('InstructionsService', [ function() {
+
+  var instructionsObj = {};
+
+  instructionsObj.instructions = {
+    newLocations : {
+      text : 'To add a new location, tap and hold on the map',
+      seen : false
+    }
+  };
+
+  return instructionsObj;
+
+}]);
 angular.module('starter').controller('MapController',
   [ '$scope',
     '$cordovaGeolocation',
@@ -138,3 +239,4 @@ angular.module('starter').controller('MapController',
       };
 
     }]);
+

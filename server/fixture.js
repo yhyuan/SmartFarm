@@ -1,17 +1,4 @@
-  Meteor.startup(function() {
-      console.log(Fields.find({}).count());
-      if (Fields.find({}).count() === 0) {
-          Fields.insert({
-              name: "test1"
-          });
-          Fields.insert({
-              name: "test2"
-          });
-          Fields.insert({
-              name: "test3"
-          });
-      }
-  });
+
 
   Meteor.publish('Fields', function() {
       return Fields.find({});
@@ -70,11 +57,11 @@
   };
 
   Meteor.methods({
-      'geoJsonForIp': function(ip) {
-          console.log(ip);
+      'geoJsonForAddress': function(address) {
+          console.log(address);
           // avoid blocking other method calls from the same client
           this.unblock();
-          var apiUrl = 'http://www.telize.com/geoip/' + ip;
+          var apiUrl = 'http://api.map.baidu.com/geocoder/v2/?address=' + address + '&output=json&ak=dg6vqwlXGRKITgjxC6c2iQ08';
           // asynchronous call to the dedicated API calling function
           var response = Meteor.wrapAsync(apiCall)(apiUrl);
           return response;

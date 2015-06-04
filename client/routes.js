@@ -35,6 +35,15 @@
                       }
                   }
               })
+              .state('tabs.editField', {
+                  url: "/editField/:fieldId",
+                  views: {
+                      'fields-tab': {
+                          templateUrl: "client/fields/views/editField.ng.html",
+                          controller: 'EditFieldTabCtrl'
+                      }
+                  }
+              })
               .state('tabs.insurance', {
                   url: "/insurance",
                   views: {

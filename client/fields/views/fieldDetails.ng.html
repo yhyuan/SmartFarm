@@ -1,5 +1,9 @@
-    <ion-view view-title="Field Detail">
+<ion-view view-title="Field Detail">
+  <ion-nav-buttons side="right">
+  <a class="button button-clear icon ion-edit" href="#/tab/editField/{{field._id}}"></a>  
+  </ion-nav-buttons>
+
         <ion-content class="padding">
         {{field.name}}
         </ion-content>
-      </ion-view>
+</ion-view>

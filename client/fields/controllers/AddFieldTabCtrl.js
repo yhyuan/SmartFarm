@@ -1,5 +1,5 @@
- angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', "leafletData", '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
-      function($scope, leafletData, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state', "leafletData", '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
+      function($scope, $state, leafletData, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
           L.drawLocal.draw.toolbar.buttons.polygon = 'Draw field boundary';
           L.drawLocal.edit.toolbar.buttons.edit = 'Edit field boundary';
           L.drawLocal.edit.toolbar.buttons.editDisabled = 'No fields to edit';
@@ -77,12 +77,30 @@
               map.on('draw:created', function (e) {
                 var layer = e.layer;
                 drawnItems.addLayer(layer);
-                console.log(JSON.stringify(layer.toGeoJSON()));
+                //console.log(JSON.stringify(layer.toGeoJSON()));
+                $scope.data.newFieldGeometry = layer.toGeoJSON();
+              });
+              map.on('draw:edited', function (e) {
+                  var layers = e.layers;
+                  layers.eachLayer(function (layer) {
+                    $scope.data.newFieldGeometry = layer.toGeoJSON();
+                      //do whatever you want, most likely save back to db
+                  });
+              });
+              map.on('draw:deleted', function (e) {
+                  var layers = e.layers;
+                  layers.eachLayer(function (layer) {
+                      $scope.data.newFieldGeometry = layer.toGeoJSON();
+                  });
               });
            });
-
           $scope.save = function () {
-            console.log('save');
+            var newField = {
+              name: $scope.data.newFieldName,
+              geometry: $scope.data.newFieldGeometry
+            };
+            $meteor.collection(Fields).save(newField);
+            $state.transitionTo('tabs.fields');
           };
           $scope.data = {
               method: 'GPS'
@@ -167,14 +185,6 @@
                         $scope.map.center.lat  = position.coords.latitude;
                         $scope.map.center.lng = position.coords.longitude;
                         $scope.map.center.zoom = 15;
-/*                              $scope.map.markers.now = {
-                                lat:position.coords.latitude,
-                                lng:position.coords.longitude,
-                                message: "You Are Here",
-                                focus: true,
-                                draggable: false
-                              };
-*/
                       };
                       var gpsErrorback = function (err) {
                         transferState("FindLocationGPSFailed");
@@ -252,6 +262,14 @@
               $ionicPopup.show(state.popup).then(state.callback);
           };
           transferState("inputFieldName");
+/*                              $scope.map.markers.now = {
+                                lat:position.coords.latitude,
+                                lng:position.coords.longitude,
+                                message: "You Are Here",
+                                focus: true,
+                                draggable: false
+                              };
+*/
 
 
           /*

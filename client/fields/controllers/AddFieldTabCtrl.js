@@ -1,9 +1,34 @@
- angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
-      function($scope, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', "leafletData", '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
+      function($scope, leafletData, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+          L.drawLocal.draw.toolbar.buttons.polygon = 'Draw field boundary';
+          L.drawLocal.edit.toolbar.buttons.edit = 'Edit field boundary';
+          L.drawLocal.edit.toolbar.buttons.editDisabled = 'No fields to edit';
+          L.drawLocal.edit.toolbar.buttons.remove = 'Delete fields';
+          L.drawLocal.edit.toolbar.buttons.removeDisabled = 'No fields to delete';
           $scope.map = {
               defaults: {
                   maxZoom: 18,
                   zoomControlPosition: 'bottomleft'
+              },
+              controls: {
+                  draw: {
+                    position: 'topright',
+                    polygon: {
+                      allowIntersection: false,
+                      showArea: true,
+                      drawError: {
+                        color: '#b00b00',
+                        timeout: 1000
+                      },
+                      shapeOptions: {
+                        color: '#bada55'
+                      }
+                    },
+                    polyline: false, 
+                    rectangle: false,
+                    circle: false, 
+                    marker: false
+                  }
               },
               layers: {
                   baselayers: {
@@ -45,6 +70,17 @@
               lng: 117,
               zoom: 12
           };
+          //console.log(leafletData);
+          
+          leafletData.getMap().then(function(map) {
+              var drawnItems = $scope.map.controls.edit.featureGroup;              
+              map.on('draw:created', function (e) {
+                var layer = e.layer;
+                drawnItems.addLayer(layer);
+                console.log(JSON.stringify(layer.toGeoJSON()));
+              });
+           });
+
           $scope.save = function () {
             console.log('save');
           };

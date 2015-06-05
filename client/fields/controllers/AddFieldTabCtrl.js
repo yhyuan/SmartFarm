@@ -188,7 +188,7 @@
                       };
                       var gpsErrorback = function (err) {
                         transferState("FindLocationGPSFailed");
-                      };                      
+                      }; 
                       if (Meteor.isCordova) {
                           $cordovaGeolocation
                             .getCurrentPosition()
@@ -243,20 +243,40 @@
                           }
                       ]
                   },
-                  callback: function(res) {
-                      $meteor.call('geoJsonForAddress', res, function(err, result) {
-                          console.log('geoJsonForAddress');
-                          console.log(result);
-                          // The method call sets the Session variable to the callback value  
-                          if (err) {
-                              //Session.set('location', {error: err});  {"results":[],"status":1,"msg":"Internal Service Error:\u65e0\u76f8\u5173\u7ed3\u679c"}
-                          } else {
-                              //Session.set('location', res);  {"status":0,"result":{"location":{"lng":120.66880872172,"lat":28.336390468031},"precise":0,"confidence":14,"level":"\u533a\u53bf"}}
-                              return result;
-                          }
-                      });
+                  callback: function(address) {
+                      var geocodingCallback = function (response) {
+                        var latlng = response.result.location;
+                        $scope.map.center.lat  = latlng.lat;
+                        $scope.map.center.lng = latlng.lng;
+                        $scope.map.center.zoom = 15;
+                      };
+                      var geocodingErrorback = function (err) {
+                        transferState("FindLocationAddressFailed");
+                      }; 
+                      $meteor.call('geoJsonForAddress', address).then(geocodingCallback, geocodingErrorback);
                   }
-              }
+              },
+              FindLocationAddressFailed: {
+                  popup: {
+                      template: '',
+                      title: 'Finding Location Failed',
+                      subTitle: 'Failed to find the location with address. Please try with another address to find your location.',
+                      scope: $scope,
+                      buttons: [
+                          //{ text: 'Cancel' },
+                          {
+                              text: '<b>OK</b>',
+                              type: 'button-positive',
+                              onTap: function(e) {
+
+                              }
+                          }
+                      ]
+                  },
+                  callback: function(res) {
+                      transferState("findLocationMethod");
+                  }
+              },
           };
           var transferState = function(stateName) {
               var state = states[stateName];

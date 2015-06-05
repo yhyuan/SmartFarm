@@ -1,0 +1,29 @@
+urigo:ionic
+	fastclick
+	angularui:angular-ui-router
+	angular:angular
+	meteor
+	angular:angular-sanitize
+	angular:angular-animate
+
+urigo:angular
+	angular:angular
+	meteor
+	dburles:mongo-collection-instances
+	minimongo
+	observe-sequence
+	html-tools
+	
+angularui:angular-ui-router
+	angular:angular
+	meteor
+	
+piotrkaczmarek:angular-leaflet-directive
+	fortawesome:fontawesome
+	meteor
+	bevanhunt:leaflet
+	angularjs:angular
+	
+netanelgilad:ng-cordova
+	angular:angular
+	meteor

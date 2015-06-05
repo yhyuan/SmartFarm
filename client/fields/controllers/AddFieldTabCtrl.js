@@ -75,12 +75,15 @@
           leafletData.getMap().then(function(map) {
               var drawnItems = $scope.map.controls.edit.featureGroup;              
               map.on('draw:created', function (e) {
+                console.log('draw:created');
+                console.log(L.drawLocal.draw);
                 var layer = e.layer;
                 drawnItems.addLayer(layer);
                 //console.log(JSON.stringify(layer.toGeoJSON()));
                 $scope.data.newFieldGeometry = layer.toGeoJSON();
               });
               map.on('draw:edited', function (e) {
+                 console.log('draw:edited');
                   var layers = e.layers;
                   layers.eachLayer(function (layer) {
                     $scope.data.newFieldGeometry = layer.toGeoJSON();
@@ -88,6 +91,7 @@
                   });
               });
               map.on('draw:deleted', function (e) {
+                 console.log('draw:deleted');
                   var layers = e.layers;
                   layers.eachLayer(function (layer) {
                       $scope.data.newFieldGeometry = layer.toGeoJSON();
@@ -99,7 +103,15 @@
               name: $scope.data.newFieldName,
               geometry: $scope.data.newFieldGeometry
             };
-            $meteor.collection(Fields).save(newField);
+            $meteor.collection(Fields).save(newField).then(function(res) {
+              //console.log(res[0]._id);
+              //$state.transitionTo('tabs.fields');
+              $state.transitionTo('tabs.fieldDetails', {fieldId: res[0]._id});
+            });
+            //console.log(test);
+            
+          };
+          $scope.cancel = function () {
             $state.transitionTo('tabs.fields');
           };
           $scope.data = {
@@ -251,7 +263,7 @@
                         $scope.map.center.zoom = 15;
                       };
                       var geocodingErrorback = function (err) {
-                        transferState("FindLocationAddressFailed");
+                        //transferState("FindLocationAddressFailed");
                       }; 
                       $meteor.call('geoJsonForAddress', address).then(geocodingCallback, geocodingErrorback);
                   }

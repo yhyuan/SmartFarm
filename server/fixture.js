@@ -37,10 +37,18 @@
 
       try {
           var response = HTTP.get(apiUrl).data;
+          console.log(response);
           // A successful API call returns no error 
           // but the contents from the JSON response
-          callback(null, response);
+          if(response.status === 0) {
+            callback(null, response);
+          } else {
+            // Create an Error object and return it via callback
+            var myError = new Meteor.Error(501, response);
+            callback(myError, null);
+          }          
       } catch (error) {
+          //console.log(error);
           // If the API responded with an error message and a payload 
           if (error.response) {
               var errorCode = error.response.data.code;
@@ -58,7 +66,7 @@
 
   Meteor.methods({
       'geoJsonForAddress': function(address) {
-          console.log(address);
+          //console.log(address);
           // avoid blocking other method calls from the same client
           this.unblock();
           var apiUrl = 'http://api.map.baidu.com/geocoder/v2/?address=' + address + '&output=json&ak=dg6vqwlXGRKITgjxC6c2iQ08';

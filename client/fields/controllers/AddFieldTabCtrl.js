@@ -244,14 +244,15 @@
                       ]
                   },
                   callback: function(res) {
-                      $meteor.call('geoJsonForAddress', res, function(err, res) {
-                          console.log(res);
+                      $meteor.call('geoJsonForAddress', res, function(err, result) {
+                          console.log('geoJsonForAddress');
+                          console.log(result);
                           // The method call sets the Session variable to the callback value  
                           if (err) {
                               //Session.set('location', {error: err});  {"results":[],"status":1,"msg":"Internal Service Error:\u65e0\u76f8\u5173\u7ed3\u679c"}
                           } else {
                               //Session.set('location', res);  {"status":0,"result":{"location":{"lng":120.66880872172,"lat":28.336390468031},"precise":0,"confidence":14,"level":"\u533a\u53bf"}}
-                              return res;
+                              return result;
                           }
                       });
                   }

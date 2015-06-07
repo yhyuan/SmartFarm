@@ -3,6 +3,26 @@
 
           $urlRouterProvider.otherwise("/tab/fields");
           $stateProvider
+              .state('login', {
+                    url: '/login',
+                    templateUrl: 'client/login/views/login.ng.html',
+                    controller: 'LoginCtrl'
+                })
+              .state('signup', {
+                    url: '/signup',
+                    templateUrl: 'client/login/views/signup.ng.html',
+                    controller: 'SignupCtrl'
+                })
+              .state('forgotpassword', {
+                    url: '/forgotpassword',
+                    templateUrl: 'client/login/views/forgotpassword.ng.html',
+                    controller: 'ForgotPasswordCtrl'
+                })
+              .state('changepassword', {
+                    url: '/changepassword',
+                    templateUrl: 'client/login/views/changepassword.ng.html',
+                    controller: 'ChangePasswordCtrl'
+                })
               .state('tabs', {
                   url: "/tab",
                   abstract: true,

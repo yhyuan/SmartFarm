@@ -1,25 +1,43 @@
+Meteor.publish('fields', function() {
+    return Fields.find({
+        $or: [{
+            staffs: {
+                $in: [this.userId]
+            }
+        }, {
+            $and: [{
+                owner: this.userId
+            }, {
+                owner: {
+                    $exists: true
+                }
+            }]
 
+        }]
+    });
+});
+  
+  Fields.allow({
+    insert: function (userId, field) {
+      return userId && field.owner === userId;
+    },
+    update: function (userId, field, fields, modifier) {
+      if (userId !== field.owner)
+        return false;
 
-  Meteor.publish('Fields', function() {
-      return Fields.find({});
+      return true;
+    },
+    remove: function (userId, field) {
+      if (userId !== field.owner)
+        return false;
+
+      return true;
+    }
   });
-
+/*
   Meteor.publish('Tasks', function() {
       return Tasks.find({});
   });
-
-  Fields.allow({
-      insert: function() {
-          return true;
-      },
-      update: function() {
-          return true;
-      },
-      remove: function() {
-          return true;
-      }
-  });
-
   Tasks.allow({
       insert: function() {
           return true;
@@ -31,7 +49,7 @@
           return true;
       }
   });
-
+*/
   var apiCall = function(apiUrl, callback) {
       // try…catch allows you to handle errors 
 

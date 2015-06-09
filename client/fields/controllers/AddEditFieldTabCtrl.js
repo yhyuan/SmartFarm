@@ -165,6 +165,8 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
                     name: $scope.data.newFieldName,
                     geometry: $scope.map.controls.edit.featureGroup.toGeoJSON()
                 };
+                newField.owner=$rootScope.currentUser._id;
+                newField.staffs= [];
                 $meteor.collection(Fields).save(newField).then(function(res) {
                     removeLayers($scope, leafletMap);
                     $state.transitionTo('tabs.fieldDetails', {

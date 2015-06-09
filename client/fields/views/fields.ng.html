@@ -4,7 +4,7 @@
       </ion-nav-buttons>     
         <ion-content class="padding">
 			<ion-list>
-			      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="field in Fields" type="item-text-wrap" href="#/tab/fields/{{field._id}}">
+			      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="field in fields" type="item-text-wrap" href="#/tab/fields/{{field._id}}">
 			        <h2>Name: {{field.name}}</h2>
 			        <p>Area: {{(calculateArea(field.geometry)/10000).toFixed(2)}} hectares</p>
 			        <i class="icon ion-chevron-right icon-accessory"></i>

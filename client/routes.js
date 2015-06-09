@@ -1,7 +1,7 @@
   angular.module('app.example').config(['$urlRouterProvider', '$stateProvider',
       function($urlRouterProvider, $stateProvider) {
 
-          $urlRouterProvider.otherwise("/tab/fields");
+          $urlRouterProvider.otherwise("/login");
           $stateProvider
               .state('login', {
                     url: '/login',
@@ -26,14 +26,31 @@
               .state('tabs', {
                   url: "/tab",
                   abstract: true,
-                  templateUrl: "client/templates/index.ng.html"
+                  templateUrl: "client/templates/index.ng.html",
+                  resolve: {
+                    "currentUser": ["$meteor", function($meteor){
+                      return $meteor.requireUser();
+                    }]
+                  }
               })
               .state('tabs.fields', {
                   url: "/fields",
+                  /*resolve: {
+                    "currentUser": ["$meteor", function($meteor){
+                      return $meteor.requireUser();
+                    }]
+                  },*/
                   views: {
                       'fields-tab': {
                           templateUrl: "client/fields/views/fields.ng.html",
-                          controller: 'FieldsTabCtrl'
+                          controller: 'FieldsTabCtrl',
+                          resolve: {
+                            'subscribe': [
+                              '$meteor', function($meteor) {
+                                return $meteor.subscribe('fields');
+                              }
+                            ]
+                          }
                       }
                   }
               })
@@ -76,7 +93,8 @@
                   url: "/profile",
                   views: {
                       'profile-tab': {
-                          templateUrl: "client/templates/profile.ng.html"
+                          templateUrl: "client/profile/views/profile.ng.html",
+                          controller: 'ProfileTabCtrl'
                       }
                   }
               });
@@ -91,3 +109,13 @@
                 });*/
       }
   ]);
+
+  angular.module("app.example").run(["$rootScope", "$state", function($rootScope, $state) {
+  $rootScope.$on("$stateChangeError", function(event, toState, toParams, fromState, fromParams, error) {
+    // We can catch the error thrown when the $requireUser promise is rejected
+    // and redirect the user back to the main page
+    if (error === "AUTH_REQUIRED") {
+      $state.go('tabs.fields');
+    }
+  });
+}]);

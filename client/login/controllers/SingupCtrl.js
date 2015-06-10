@@ -1,5 +1,5 @@
- angular.module('app.example').controller('SignupCtrl', ['$scope', '$state', '$meteorCollection', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
-     function($scope, $state, $meteorCollection, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
+ angular.module('app.example').controller('SignupCtrl', ['$scope', '$state', '$ionicPopup',
+     function($scope, $state, $ionicPopup) {
          $scope.data = {};
 
          $scope.signup = function() {
@@ -42,7 +42,7 @@
              };
              var signupErrorback = function(msg) {
                  var alertPopup = $ionicPopup.alert({
-                     title: 'Failed to sign up',
+                     title: '注册失败',
                      template: msg
                  });
                  alertPopup.then(function(res) {
@@ -72,16 +72,16 @@
                                  }
                              });
                          } else {
-                             signupErrorback('Your two passwords are not equivalent.');
+                             signupErrorback('密码和确认密码不一致');
                          }
                      } else {
-                         signupErrorback("Passowrd is not valid.");
+                         signupErrorback("密码必须至少六个字符长");
                      }
                  } else {
-                     signupErrorback("Email is not valid.");
+                     signupErrorback("电子邮件错误");
                  }
              } else {
-                 signupErrorback("Filed are empty.");
+                 signupErrorback("有字段为空");
              }
          }
      }

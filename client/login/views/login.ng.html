@@ -1,19 +1,19 @@
-<ion-view view-title="Login" name="login-view">
+<ion-view view-title="登陆" name="login-view">
   <ion-content class="padding">
       <div class="list list-inset">
           <label class="item item-input">
-              <input type="text" placeholder="Username" ng-model="data.username">
+              <input type="text" placeholder="电子邮件" ng-model="data.username">
           </label>
           <label class="item item-input">
-              <input type="password" placeholder="Password" ng-model="data.password">
+              <input type="password" placeholder="密码" ng-model="data.password">
           </label>
       </div>
-      <button class="button button-block button-calm" ng-click="login()">Login</button>
+      <button class="button button-block button-calm" ng-click="login()">登陆</button>
       <p class="text-center">
-          <a href="#/signup">Sign up</a>
+          没有账号？请<a href="#/signup">注册</a>
       </p>
       <p class="text-center">
-          <a href="#/forgotpassword">Forgot password</a>
+          忘记密码？<a href="#/forgotpassword">重置密码</a>
       </p>
   </ion-content>
 </ion-view>

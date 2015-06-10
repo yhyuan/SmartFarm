@@ -3,7 +3,7 @@ Meteor.startup(function() {
         Accounts.createUser({
             username: 'yyh',
             email: 'yhyuan@gmail.com',
-            password: '1234',
+            password: '123456',
             profile: {
                 first_name: 'fname',
                 last_name: 'lname',

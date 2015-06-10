@@ -1,9 +1,23 @@
 var drawToolsInitialization = function() {
-    L.drawLocal.draw.toolbar.buttons.polygon = 'Draw field boundary';
-    L.drawLocal.edit.toolbar.buttons.edit = 'Edit field boundary';
-    L.drawLocal.edit.toolbar.buttons.editDisabled = 'No fields to edit';
-    L.drawLocal.edit.toolbar.buttons.remove = 'Delete fields';
-    L.drawLocal.edit.toolbar.buttons.removeDisabled = 'No fields to delete';
+    L.drawLocal.draw.toolbar.buttons.polygon = '绘制地块边界';
+    L.drawLocal.edit.toolbar.buttons.edit = '编辑地块边界';
+    L.drawLocal.edit.toolbar.buttons.editDisabled = '没有地块边界可以编辑';
+    L.drawLocal.edit.toolbar.buttons.remove = '删除地块边界';
+    L.drawLocal.edit.toolbar.buttons.removeDisabled = '没有地块边界可以删除';
+    L.drawLocal.draw.toolbar.actions.text = '取消';
+    L.drawLocal.draw.toolbar.actions.title = '取消绘制';
+    L.drawLocal.draw.toolbar.undo.text = '删除最后一个结点';
+    L.drawLocal.draw.toolbar.undo.title = '删除所绘制最后一个结点';
+    L.drawLocal.edit.toolbar.actions.cancel.text = '取消';
+    L.drawLocal.edit.toolbar.actions.cancel.title = '编辑，放弃所有修改。';
+    L.drawLocal.edit.toolbar.actions.save.text = '保存';
+    L.drawLocal.edit.toolbar.actions.save.title = '保存修改';
+    L.drawLocal.draw.handlers.polygon.tooltip.start = '请点击地图以开始绘制地块边界';
+    L.drawLocal.draw.handlers.polygon.tooltip.cont = '请点击地图并绘制地块边界';
+    L.drawLocal.draw.handlers.polygon.tooltip.end = '请点击第一个结点来结束地块边界的绘制';
+    L.drawLocal.edit.handlers.edit.tooltip.text = '拖拉地块边界结点可以编辑地块边界';
+    L.drawLocal.edit.handlers.edit.tooltip.subtext = '请点击取消来取消所有修改';
+    L.drawLocal.edit.handlers.remove.tooltip.text = '请点击地块边界来删除该地块边界';
 };
 
 var createLeafletMapSettings = function(geometry) {
@@ -94,7 +108,6 @@ var setupLeafletMap = function(scope, map) {
     var drawItems = scope.map.controls.edit.featureGroup;
     drawItems.addTo(map);
     if (drawItems.getLayers().length > 0) {
-        
         map.fitBounds(drawItems);
     }
     map.on('draw:created', function(e) {
@@ -122,28 +135,28 @@ var removeLayers = function(scope, map) {
     });
 };
 
-var isFieldSavable = function(scope) {
+var isFieldSavable = function(scope, $ionicPopup) {
     var drawnItems = scope.map.controls.edit.featureGroup;
     if (drawnItems.getLayers().length === 0) {
         $ionicPopup.alert({
-            title: 'Field Boundary is Empty',
-            template: 'Field Boundary is Empty. Please use the draw tool to create field boundary.'
+            title: '地块边界为空',
+            template: '地块边界为空。请使用画图工具来添加地块边界。'
         });
         return false;
     }
 
     if (scope.isEditing) {
         $ionicPopup.alert({
-            title: 'Editing field boundary',
-            template: 'You are editing field boundary now. Please save your editing firstly.'
+            title: '地块边界编辑',
+            template: '您正在编辑地块边界，请保存地块边界编辑结果后，再保存地块信息。'
         });
         return false;
     }
 
     if (scope.isDeleting) {
         $ionicPopup.alert({
-            title: 'Deleting field boundary',
-            template: 'You are deleting field now. Please save your field boundary firstly.'
+            title: '地块边界删除',
+            template: '您正在删除地块边界，请保存地块边界删除结果后，再保存地块信息。'
         });
         return false;
     }
@@ -160,16 +173,16 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
             leafletMap = setupLeafletMap($scope, map);
         });
         $scope.save = function() {
-            if (isFieldSavable($scope)) {
+            if (isFieldSavable($scope, $ionicPopup)) {
                 var newField = {
                     name: $scope.data.newFieldName,
                     geometry: $scope.map.controls.edit.featureGroup.toGeoJSON()
                 };
-                newField.owner=$rootScope.currentUser._id;
-                newField.staffs= [];
+                newField.owner = $rootScope.currentUser._id;
+                newField.staffs = [];
                 $meteor.collection(Fields).save(newField).then(function(res) {
                     removeLayers($scope, leafletMap);
-                    $state.transitionTo('tabs.fieldDetails', {
+                    $state.transitionTo('fieldDetails', {
                         fieldId: res[0]._id
                     });
                 });
@@ -186,13 +199,13 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
             inputFieldName: {
                 popup: {
                     template: '<input ng-model="data.newFieldName">',
-                    title: 'Add New Field',
-                    subTitle: 'Please input the new field name',
+                    title: '地块名',
+                    subTitle: '请输入地块名',
                     scope: $scope,
                     buttons: [
                         //{ text: 'Cancel' },
                         {
-                            text: '<b>Next</b>',
+                            text: '<b>下一步</b>',
                             type: 'button-positive',
                             onTap: function(e) {
                                 if (!$scope.data.newFieldName) {
@@ -211,14 +224,14 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
             },
             findLocationMethod: {
                 popup: {
-                    template: '<ion-radio ng-model="data.method" ng-value="\'GPS\'">GPS</ion-radio><ion-radio ng-model="data.method" ng-value="\'address\'">Address</ion-radio>',
-                    title: 'Find location',
-                    subTitle: 'Please select location search method',
+                    template: '<ion-radio ng-model="data.method" ng-value="\'GPS\'">GPS</ion-radio><ion-radio ng-model="data.method" ng-value="\'address\'">城镇或地址</ion-radio>',
+                    title: '位置寻找',
+                    subTitle: '请选择位置寻找方法',
                     scope: $scope,
                     buttons: [
                         //{ text: 'Cancel' },
                         {
-                            text: '<b>Next</b>',
+                            text: '<b>下一步</b>',
                             type: 'button-positive',
                             onTap: function(e) {
                                 if (!$scope.data.method) {
@@ -244,12 +257,12 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
                 popup: {
                     template: '',
                     title: 'GPS',
-                    subTitle: 'Find location with GPS',
+                    subTitle: '使用GPS来寻找位置',
                     scope: $scope,
                     buttons: [
                         //{ text: 'Cancel' },
                         {
-                            text: '<b>OK</b>',
+                            text: '<b>确认</b>',
                             type: 'button-positive',
                             onTap: function(e) {
 
@@ -280,13 +293,13 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
             FindLocationGPSFailed: {
                 popup: {
                     template: '',
-                    title: 'GPS Failed',
-                    subTitle: 'Failed to find the location with GPS. Please try to use the address search to find your location.',
+                    title: 'GPS寻找位置失败',
+                    subTitle: 'GPS寻找位置失败。请使用城镇或者地址来寻找位置。',
                     scope: $scope,
                     buttons: [
                         //{ text: 'Cancel' },
                         {
-                            text: '<b>OK</b>',
+                            text: '<b>确认</b>',
                             type: 'button-positive',
                             onTap: function(e) {
 
@@ -301,13 +314,13 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
             FindLocationAddress: {
                 popup: {
                     template: '<input ng-model="data.address">',
-                    title: 'Address',
-                    subTitle: 'Find location with address',
+                    title: '城镇或地址',
+                    subTitle: '使用城镇或地址来寻找位置',
                     scope: $scope,
                     buttons: [
                         //{ text: 'Cancel' },
                         {
-                            text: '<b>OK</b>',
+                            text: '<b>确认</b>',
                             type: 'button-positive',
                             onTap: function(e) {
                                 if (!$scope.data.address) {
@@ -336,13 +349,13 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
             FindLocationAddressFailed: {
                 popup: {
                     template: '',
-                    title: 'Finding Location Failed',
-                    subTitle: 'Failed to find the location with address. Please try with another address to find your location.',
+                    title: '城镇或地址寻找位置失败',
+                    subTitle: '无法根据您输入的城镇或地址寻找位置。请使用其他地址或者城镇来寻找您的位置。',
                     scope: $scope,
                     buttons: [
                         //{ text: 'Cancel' },
                         {
-                            text: '<b>OK</b>',
+                            text: '<b>确认</b>',
                             type: 'button-positive',
                             onTap: function(e) {
 
@@ -375,11 +388,11 @@ angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state'
             leafletMap = setupLeafletMap($scope, map);
         });
         $scope.save = function() {
-            if (isFieldSavable($scope)) {
+            if (isFieldSavable($scope, $ionicPopup)) {
                 $scope.field.geometry = $scope.map.controls.edit.featureGroup.toGeoJSON();
                 $scope.field.save();
                 removeLayers($scope, leafletMap);
-                $state.transitionTo('tabs.fieldDetails', {
+                $state.transitionTo('fieldDetails', {
                     fieldId: $stateParams.fieldId
                 });
             }
@@ -387,25 +400,29 @@ angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state'
 
         $scope.cancel = function() {
             removeLayers($scope, leafletMap);
-            $state.transitionTo('tabs.fieldDetails', {
+            $state.transitionTo('fieldDetails', {
                 fieldId: $stateParams.fieldId
             });
         };
 
         $scope.delete = function() {
             var confirmPopup = $ionicPopup.confirm({
-                title: 'Delete Field',
-                template: 'Are you sure you want to delete this field?'
+                title: '删除地块',
+                template: '您确认要删除该地块?',
+                buttons: [{
+                    text: '取消'
+                }, {
+                    text: '<b>确认</b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                        $meteor.collection(Fields).remove($scope.field);
+                        removeLayers($scope, leafletMap);
+                        $state.transitionTo('tabs.fields');
+                    }
+                }]
+
             });
-            confirmPopup.then(function(res) {
-                if (res) {
-                    $meteor.collection(Fields).remove($scope.field);
-                    removeLayers($scope, leafletMap);
-                    $state.transitionTo('tabs.fields');
-                } else {
-                    //console.log('You are not sure');
-                }
-            });
+            //confirmPopup.then(function(res) {            });
 
         };
 
@@ -417,13 +434,13 @@ angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state'
             inputFieldName: {
                 popup: {
                     template: '<input ng-model="field.name">',
-                    title: 'Edit Field Name',
-                    subTitle: 'Please edit the field name',
+                    title: '地块名编辑',
+                    subTitle: '请编辑地块名',
                     scope: $scope,
                     buttons: [
                         //{ text: 'Cancel' },
                         {
-                            text: '<b>Done</b>',
+                            text: '<b>确认</b>',
                             type: 'button-positive',
                             onTap: function(e) {
                                 if (!$scope.field.name) {

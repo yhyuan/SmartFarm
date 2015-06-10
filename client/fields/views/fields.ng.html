@@ -1,14 +1,17 @@
-     <ion-view view-title="地块列表">
-      <ion-nav-buttons side="right">
-			<a class="button button-clear icon ion-ios-plus-empty" href="#/tab/addField"></a>
-      </ion-nav-buttons>     
-        <ion-content class="padding">
-			<ion-list>
-			      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="field in fields" type="item-text-wrap" href="#/tab/fields/{{field._id}}">
-			        <h2>名字: {{field.name}}</h2>
-			        <p>面积: {{(calculateArea(field.geometry)/10000).toFixed(2)}} hectares</p>
-			        <i class="icon ion-chevron-right icon-accessory"></i>
-			      </ion-item>
-			    </ion-list>
-        </ion-content>
-      </ion-view>
+<ion-view view-title="地块">
+    <ion-nav-buttons side="right">
+        <a class="button button-clear icon ion-ios-plus-empty" href="#/addField"></a>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <div ng-show="fields.length === 0">
+            您目前没有地块可以查看，请点击右上角的添加工具添加地块。
+        </div>
+        <ion-list>
+            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="field in fields" type="item-text-wrap" href="#/fields/{{field._id}}">
+                <h2>名字: {{field.name}}</h2>
+                <p>面积: {{(calculateArea(field.geometry)/10000).toFixed(2)}} 公顷</p>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

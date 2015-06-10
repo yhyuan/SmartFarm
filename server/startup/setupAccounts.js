@@ -1,4 +1,5 @@
 // (server-side)
+/*
 Accounts.onCreateUser(function(options, user) {
   user.profile = {};
 
@@ -19,3 +20,4 @@ Accounts.validateLoginAttempt(function(attempt){
   }
   return true;
 }); 
+*/

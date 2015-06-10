@@ -1,17 +1,17 @@
 <ion-view title="编辑地块">
-  <ion-nav-buttons side="left">
-    <button ng-click="cancel();" class="button button-icon icon ion-android-cancel"></button>
-  </ion-nav-buttons>
+    <ion-nav-buttons side="left">
+        <button ng-click="cancel();" class="button button-icon icon ion-android-cancel"></button>
+    </ion-nav-buttons>
 
-  <ion-nav-buttons side="right">
-    <button ng-click="delete();" class="button button-icon icon ion-ios-trash"></button>
-    <button ng-click="save();" class="button button-icon icon ion-android-done-all"></button>
-  </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button ng-click="delete();" class="button button-icon icon ion-ios-trash"></button>
+        <button ng-click="save();" class="button button-icon icon ion-android-done-all"></button>
+    </ion-nav-buttons>
 
-  <ion-content data-tap-disabled="true">
+    <ion-content data-tap-disabled="true">
 
-    <leaflet defaults="map.defaults" layers="map.layers" center="map.center" controls="map.controls" markers="map.markers" ng-if="map"></leaflet>
+        <leaflet defaults="map.defaults" layers="map.layers" center="map.center" controls="map.controls" markers="map.markers" ng-if="map"></leaflet>
 
-  </ion-content>
+    </ion-content>
 
 </ion-view>

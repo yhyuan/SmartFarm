@@ -1,7 +1,7 @@
  angular.module('app.example').controller('FieldsTabCtrl', ['$scope', '$meteorCollection', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
       function($scope, $meteorCollection, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
 
-          //$scope.Fields = $meteorCollection(Fields);
+          $scope.fields = $meteorCollection(Fields);
           $scope.calculateArea = function(_) {
               var geometryArea = function (_) {
                   var polygonArea = function(coords) {

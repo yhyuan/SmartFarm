@@ -54,7 +54,12 @@
                       }
                   }
               })
-              .state('tabs.fieldDetails', {
+              .state('fieldDetails', {
+                  url: "/fields/:fieldId",
+                  templateUrl: 'client/fields/views/fieldDetails.ng.html',
+                  controller: 'FieldDetailsTabCtrl'
+              })
+              /*.state('tabs.fieldDetails', {
                   url: "/fields/:fieldId",
                   views: {
                       'fields-tab': {
@@ -62,8 +67,13 @@
                           controller: 'FieldDetailsTabCtrl'
                       }
                   }
-              })
-              .state('tabs.addField', {
+              })*/
+              .state('addField', {
+                    url: '/addField',
+                    templateUrl: 'client/fields/views/addField.ng.html',
+                    controller: 'AddFieldTabCtrl'
+                })
+              /*.state('tabs.addField', {
                   url: "/addField",
                   views: {
                       'fields-tab': {
@@ -71,8 +81,13 @@
                           controller: 'AddFieldTabCtrl'
                       }
                   }
+              })*/
+              .state('editField', {
+                  url: "/editField/:fieldId",
+                  templateUrl: 'client/fields/views/editField.ng.html',
+                  controller: 'EditFieldTabCtrl'
               })
-              .state('tabs.editField', {
+              /*.state('tabs.editField', {
                   url: "/editField/:fieldId",
                   views: {
                       'fields-tab': {
@@ -80,7 +95,7 @@
                           controller: 'EditFieldTabCtrl'
                       }
                   }
-              })
+              })*/
               .state('tabs.insurance', {
                   url: "/insurance",
                   views: {

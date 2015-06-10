@@ -1,4 +1,4 @@
-Meteor.publish('fields', function() {
+Meteor.publish('Fields', function() {
     return Fields.find({
         $or: [{
             staffs: {

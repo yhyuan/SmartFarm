@@ -1,6 +1,10 @@
   angular.module('app.example').config(['$urlRouterProvider', '$stateProvider',
       function($urlRouterProvider, $stateProvider) {
-
+          var privateRoute = {
+                    "currentUser": ["$meteor", function($meteor){
+                      return $meteor.requireUser();
+                    }]
+                  };
           $urlRouterProvider.otherwise("/login");
           $stateProvider
               .state('login', {
@@ -27,37 +31,29 @@
                   url: "/tab",
                   abstract: true,
                   templateUrl: "client/templates/index.ng.html",
-                  resolve: {
-                    "currentUser": ["$meteor", function($meteor){
-                      return $meteor.requireUser();
-                    }]
-                  }
+                  resolve: privateRoute
               })
               .state('tabs.fields', {
                   url: "/fields",
-                  /*resolve: {
-                    "currentUser": ["$meteor", function($meteor){
-                      return $meteor.requireUser();
-                    }]
-                  },*/
                   views: {
                       'fields-tab': {
                           templateUrl: "client/fields/views/fields.ng.html",
-                          controller: 'FieldsTabCtrl',
+                          controller: 'FieldsTabCtrl'/*,
                           resolve: {
                             'subscribe': [
                               '$meteor', function($meteor) {
                                 return $meteor.subscribe('fields');
                               }
                             ]
-                          }
+                          }*/
                       }
                   }
               })
               .state('fieldDetails', {
                   url: "/fields/:fieldId",
                   templateUrl: 'client/fields/views/fieldDetails.ng.html',
-                  controller: 'FieldDetailsTabCtrl'
+                  controller: 'FieldDetailsTabCtrl',
+                  resolve: privateRoute
               })
               /*.state('tabs.fieldDetails', {
                   url: "/fields/:fieldId",
@@ -71,7 +67,8 @@
               .state('addField', {
                     url: '/addField',
                     templateUrl: 'client/fields/views/addField.ng.html',
-                    controller: 'AddFieldTabCtrl'
+                    controller: 'AddFieldTabCtrl',
+                  resolve: privateRoute
                 })
               /*.state('tabs.addField', {
                   url: "/addField",
@@ -85,7 +82,8 @@
               .state('editField', {
                   url: "/editField/:fieldId",
                   templateUrl: 'client/fields/views/editField.ng.html',
-                  controller: 'EditFieldTabCtrl'
+                  controller: 'EditFieldTabCtrl',
+                  resolve: privateRoute
               })
               /*.state('tabs.editField', {
                   url: "/editField/:fieldId",
@@ -95,6 +93,12 @@
                           controller: 'EditFieldTabCtrl'
                       }
                   }
+              })*/
+              /*.state('deleteField', {
+                  url: "/deleteField/:fieldId",
+                  templateUrl: 'client/fields/views/deleteField.ng.html',
+                  controller: 'DeleteFieldTabCtrl',
+                  resolve: privateRoute
               })*/
               .state('tabs.insurance', {
                   url: "/insurance",
@@ -130,7 +134,7 @@
     // We can catch the error thrown when the $requireUser promise is rejected
     // and redirect the user back to the main page
     if (error === "AUTH_REQUIRED") {
-      $state.go('tabs.fields');
+      $state.go('login');
     }
   });
 }]);

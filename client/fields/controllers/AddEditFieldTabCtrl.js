@@ -1,26 +1,5 @@
-var drawToolsInitialization = function() {
-    L.drawLocal.draw.toolbar.buttons.polygon = '绘制地块边界';
-    L.drawLocal.edit.toolbar.buttons.edit = '编辑地块边界';
-    L.drawLocal.edit.toolbar.buttons.editDisabled = '没有地块边界可以编辑';
-    L.drawLocal.edit.toolbar.buttons.remove = '删除地块边界';
-    L.drawLocal.edit.toolbar.buttons.removeDisabled = '没有地块边界可以删除';
-    L.drawLocal.draw.toolbar.actions.text = '取消';
-    L.drawLocal.draw.toolbar.actions.title = '取消绘制';
-    L.drawLocal.draw.toolbar.undo.text = '删除最后一个结点';
-    L.drawLocal.draw.toolbar.undo.title = '删除所绘制最后一个结点';
-    L.drawLocal.edit.toolbar.actions.cancel.text = '取消';
-    L.drawLocal.edit.toolbar.actions.cancel.title = '编辑，放弃所有修改。';
-    L.drawLocal.edit.toolbar.actions.save.text = '保存';
-    L.drawLocal.edit.toolbar.actions.save.title = '保存修改';
-    L.drawLocal.draw.handlers.polygon.tooltip.start = '请点击地图以开始绘制地块边界';
-    L.drawLocal.draw.handlers.polygon.tooltip.cont = '请点击地图并绘制地块边界';
-    L.drawLocal.draw.handlers.polygon.tooltip.end = '请点击第一个结点来结束地块边界的绘制';
-    L.drawLocal.edit.handlers.edit.tooltip.text = '拖拉地块边界结点可以编辑地块边界';
-    L.drawLocal.edit.handlers.edit.tooltip.subtext = '请点击取消来取消所有修改';
-    L.drawLocal.edit.handlers.remove.tooltip.text = '请点击地块边界来删除该地块边界';
-};
-
 var createLeafletMapSettings = function(geometry) {
+    //console.log(geometry);
     var drawnItems = new L.FeatureGroup();
     if (geometry) {
         L.geoJson(geometry, {
@@ -106,10 +85,32 @@ var createLeafletMapSettings = function(geometry) {
 
 var setupLeafletMap = function(scope, map) {
     var drawItems = scope.map.controls.edit.featureGroup;
+    console.log(drawItems.getLayers().length);
+    console.log("Before: ");
+    map.eachLayer(function (layer) {
+        console.log(layer);
+    });
+/*    scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
+        map.addLayer(layer)
+    });
+*/
+
     drawItems.addTo(map);
     if (drawItems.getLayers().length > 0) {
         map.fitBounds(drawItems);
     }
+    /*
+    map.eachLayer(function (layer) {
+        if(layer.hasOwnProperty('_url')) {
+            layer.bringToBack();
+        }
+    });*/
+    //setTimeout(function(){ drawItems.addTo(map);}, 1000);
+    console.log("After: ");
+    map.eachLayer(function (layer) {
+        console.log(layer);
+    });
+
     map.on('draw:created', function(e) {
         var layer = e.layer;
         scope.map.controls.edit.featureGroup.addLayer(layer);
@@ -130,9 +131,35 @@ var setupLeafletMap = function(scope, map) {
 };
 
 var removeLayers = function(scope, map) {
+    console.log("before remove layers: ");
+    map.eachLayer(function (layer) {
+        console.log(layer);
+    });
+    map.removeLayer(scope.map.controls.edit.featureGroup);
+    /*
     scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
         map.removeLayer(layer)
+    });    */
+    /*
+    scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
+        map.removeLayer(layer)
+    });*/
+/*
+    var removableLayers = [];
+    map.eachLayer(function (layer) {
+        map.removeLayer(layer);
     });
+    */
+    /*    
+    for(var i=0; i<removableLayers.length; i++) {
+        map.removeLayer(removableLayers[i])
+    }*/
+    scope.map.controls.edit.featureGroup = new L.FeatureGroup();
+    console.log("After remove layers: ");
+    map.eachLayer(function (layer) {
+        console.log(layer);
+    });
+    //map.remove();
 };
 
 var isFieldSavable = function(scope, $ionicPopup) {
@@ -164,7 +191,6 @@ var isFieldSavable = function(scope, $ionicPopup) {
 };
 angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state', "leafletData", '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
     function($scope, $state, leafletData, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
-        drawToolsInitialization();
         $scope.map = createLeafletMapSettings();
         var leafletMap;
         $scope.isEditing = false;
@@ -180,11 +206,15 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
                 };
                 newField.owner = $rootScope.currentUser._id;
                 newField.staffs = [];
+                //console.log(Fields.find().fetch());
                 $meteor.collection(Fields).save(newField).then(function(res) {
+                    //console.log(Fields.find().fetch());
                     removeLayers($scope, leafletMap);
                     $state.transitionTo('fieldDetails', {
                         fieldId: res[0]._id
                     });
+                }, function(err) {
+                    console.log(err);
                 });
             }
         };
@@ -379,7 +409,6 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
 angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state', "leafletData", '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
     function($scope, $state, leafletData, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
         $scope.field = $meteor.object(Fields, $stateParams.fieldId, false);
-        drawToolsInitialization();
         $scope.map = createLeafletMapSettings($scope.field.geometry);
         var leafletMap;
         $scope.isEditing = false;
@@ -415,15 +444,12 @@ angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state'
                     text: '<b>确认</b>',
                     type: 'button-positive',
                     onTap: function(e) {
-                        $meteor.collection(Fields).remove($scope.field);
                         removeLayers($scope, leafletMap);
+                        $meteor.collection(Fields).remove($scope.field);
                         $state.transitionTo('tabs.fields');
                     }
                 }]
-
             });
-            //confirmPopup.then(function(res) {            });
-
         };
 
 

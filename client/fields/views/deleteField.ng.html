@@ -1,0 +1,20 @@
+<ion-view title="Delete地块">
+
+  <!--<ion-nav-buttons side="left">
+    <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+  </ion-nav-buttons>
+-->
+  <ion-nav-buttons side="left">
+    <a class="button button-clear icon ion-edit" href="#/editField/{{field._id}}"></a>
+  </ion-nav-buttons>
+
+  <ion-nav-buttons side="right">
+    <button ng-click="delete();" class="button button-icon icon ion-ios-trash">Confirm</button>
+  </ion-nav-buttons>
+
+  <ion-content data-tap-disabled="true">
+   Delete
+
+  </ion-content>
+
+</ion-view>

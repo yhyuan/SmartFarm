@@ -1,5 +1,4 @@
   Meteor.startup(function() {
-      console.log(Fields.find({}).count());
       if (Fields.find({}).count() === 0) {
           Fields.insert({
               name: "test1",

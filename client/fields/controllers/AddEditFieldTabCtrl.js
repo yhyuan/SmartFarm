@@ -1,7 +1,10 @@
 var createLeafletMapSettings = function(geometry) {
-    //console.log(geometry);
+    console.log("createLeafletMapSettings");
+    var paths = {};
     var drawnItems = new L.FeatureGroup();
+    //console.log("json");
     if (geometry) {
+        var features = [];
         L.geoJson(geometry, {
             style: function(feature) {
                 return {
@@ -9,15 +12,34 @@ var createLeafletMapSettings = function(geometry) {
                 };
             },
             onEachFeature: function(feature, layer) {
+                //console.log(feature);
+                features.push(feature);
                 drawnItems.addLayer(layer);
             }
+        });/*
+        var pathsArray = _.map(features, function(feature) {
+            var latlngs = _.map(feature.geometry.coordinates[0], function(coor) {
+                return {lat: coor[1], lng: coor[0]};
+            });
+            return {
+                latlngs: latlngs,
+                //stroke: false,
+                weight: 2,
+                fillColor: '#ff69b4',
+                type: 'polygon'
+            };
         });
+        var pathsNames = _.map(_.range(features.length), function(i) {
+            return "p" + i;
+        })；*/
+        //paths = _.object(pathsNames, pathsArray);
     }
     return {
         defaults: {
             maxZoom: 18,
             zoomControlPosition: 'bottomleft'
         },
+        paths: paths,
         center: {
             lat: 37,
             lng: 117,
@@ -84,18 +106,22 @@ var createLeafletMapSettings = function(geometry) {
 };
 
 var setupLeafletMap = function(scope, map) {
+    console.log("setupLeafletMap");
+
     var drawItems = scope.map.controls.edit.featureGroup;
-    console.log(drawItems.getLayers().length);
+    /*console.log(drawItems.getLayers().length);
     console.log("Before: ");
     map.eachLayer(function (layer) {
         console.log(layer);
     });
+    */
 /*    scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
         map.addLayer(layer)
     });
 */
 
     drawItems.addTo(map);
+    console.log(drawItems.getLayers().length);
     if (drawItems.getLayers().length > 0) {
         map.fitBounds(drawItems);
     }
@@ -106,6 +132,7 @@ var setupLeafletMap = function(scope, map) {
         }
     });*/
     //setTimeout(function(){ drawItems.addTo(map);}, 1000);
+
     console.log("After: ");
     map.eachLayer(function (layer) {
         console.log(layer);
@@ -131,10 +158,11 @@ var setupLeafletMap = function(scope, map) {
 };
 
 var removeLayers = function(scope, map) {
+    /*
     console.log("before remove layers: ");
     map.eachLayer(function (layer) {
         console.log(layer);
-    });
+    });*/
     map.removeLayer(scope.map.controls.edit.featureGroup);
     /*
     scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
@@ -154,11 +182,13 @@ var removeLayers = function(scope, map) {
     for(var i=0; i<removableLayers.length; i++) {
         map.removeLayer(removableLayers[i])
     }*/
-    scope.map.controls.edit.featureGroup = new L.FeatureGroup();
+    //scope.map.controls.edit.featureGroup = new L.FeatureGroup();
+    scope.map.controls.edit.featureGroup.clearLayers();
+    /*
     console.log("After remove layers: ");
     map.eachLayer(function (layer) {
         console.log(layer);
-    });
+    });*/
     //map.remove();
 };
 

@@ -233,7 +233,7 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
                 var newField = {
                     name: $scope.data.newFieldName,
                     geometry: $scope.map.controls.edit.featureGroup.toGeoJSON()
-                };
+                };/*
                 newField.owner = $rootScope.currentUser._id;
                 newField.staffs = [];
                 //console.log(Fields.find().fetch());
@@ -245,7 +245,18 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
                     });
                 }, function(err) {
                     console.log(err);
-                });
+                });*/
+                                    var callback = function(response) {
+                                        console.log(response);
+                                                            $state.transitionTo('fieldDetails', {
+                        fieldId: response//res[0]._id
+                    });
+
+                    };
+                    var errorback = function(err) {
+                    };
+                    $meteor.call('createField', newField).then(callback, errorback);
+                   removeLayers($scope, leafletMap);
             }
         };
         $scope.cancel = function() {
@@ -448,8 +459,15 @@ angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state'
         });
         $scope.save = function() {
             if (isFieldSavable($scope, $ionicPopup)) {
-                $scope.field.geometry = $scope.map.controls.edit.featureGroup.toGeoJSON();
-                $scope.field.save();
+                //$scope.field.geometry = $scope.map.controls.edit.featureGroup.toGeoJSON();
+                //$scope.field.save();
+                var field = {_id: $scope.field._id, owner: $scope.field.owner, name: $scope.field.name, geometry: $scope.map.controls.edit.featureGroup.toGeoJSON()};
+                                                    var callback = function(response) {
+                    };
+                    var errorback = function(err) {
+                    };
+                    $meteor.call('createField', field).then(callback, errorback);
+
                 removeLayers($scope, leafletMap);
                 $state.transitionTo('fieldDetails', {
                     fieldId: $stateParams.fieldId

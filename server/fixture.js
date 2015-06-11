@@ -91,5 +91,21 @@ Meteor.publish('Fields', function() {
           // asynchronous call to the dedicated API calling function
           var response = Meteor.wrapAsync(apiCall)(apiUrl);
           return response;
+      },
+      'createField': function(options) {
+          if(! this.userId) {
+            throw new Meteor.Error(403, "You must be logged in");
+          }
+          return Fields.insert({staffs: [], owner: this.userId, name: options.name, geometry: options.geometry});
+      },
+      'updateField': function(options) {
+          if(! this.userId) {
+            throw new Meteor.Error(403, "You must be logged in");
+          }
+
+          if(options.owner !== this.useId) {
+            throw new Meteor.Error(403, "You must be the owner of this field.");
+          }
+          Fields.update(options._id, {$set: {name: options.name, geometry: options.geometry}});
       }
   });

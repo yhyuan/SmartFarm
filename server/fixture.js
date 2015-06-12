@@ -92,6 +92,30 @@ Meteor.publish('Fields', function() {
           var response = Meteor.wrapAsync(apiCall)(apiUrl);
           return response;
       },
+      'getWeatherForecast': function(latlng) {
+          this.unblock();
+          //https://api.forecast.io/forecast/xxxxxxxxxxxxxxxxxxxxx/lat,lon,2014-02-24T19:00:00?units=si&exclude=currently,minutely,hourly
+          var apiUrl = 'https://api.forecast.io/forecast/0e5a9a380119f9b39ba5fc18efdff39b/' + latlng.lat + ',' + latlng.lng + '?units=si';
+          // asynchronous call to the dedicated API calling function
+          var response = Meteor.wrapAsync(apiCall)(apiUrl);
+/*
+              si: Returns results in SI units. In particular, properties now have the following units:
+              summary: Any summaries containing temperature or snow accumulation units will have their values in degrees Celsius or in centimeters (respectively).
+              nearestStormDistance: Kilometers.
+              precipIntensity: Millimeters per hour.
+              precipIntensityMax: Millimeters per hour.
+              precipAccumulation: Centimeters.
+              temperature: Degrees Celsius.
+              temperatureMin: Degrees Celsius.
+              temperatureMax: Degrees Celsius.
+              apparentTemperature: Degrees Celsius.
+              dewPoint: Degrees Celsius.
+              windSpeed: Meters per second.
+              pressure: Hectopascals (which are, conveniently, equivalent to the default millibars).
+              visibility: Kilometers.
+*/          
+          return response;
+      },      
       'createField': function(options) {
           if(! this.userId) {
             throw new Meteor.Error(403, "You must be logged in");

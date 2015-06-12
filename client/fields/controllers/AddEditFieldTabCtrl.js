@@ -1,10 +1,7 @@
-var createLeafletMapSettings = function(geometry) {
-    console.log("createLeafletMapSettings");
-    var paths = {};
+var createLeafletMapSettings = function($scope) {
     var drawnItems = new L.FeatureGroup();
-    //console.log("json");
-    if (geometry) {
-        var features = [];
+    if ($scope.hasOwnProperty('field') && $scope.field.hasOwnProperty('geometry')) {
+        var geometry = $scope.field.geometry;
         L.geoJson(geometry, {
             style: function(feature) {
                 return {
@@ -12,34 +9,20 @@ var createLeafletMapSettings = function(geometry) {
                 };
             },
             onEachFeature: function(feature, layer) {
-                //console.log(feature);
-                features.push(feature);
                 drawnItems.addLayer(layer);
+                $scope.savedItems.push({
+                    "id": layer._leaflet_id,
+                    "geoJSON": feature
+                });
             }
-        });/*
-        var pathsArray = _.map(features, function(feature) {
-            var latlngs = _.map(feature.geometry.coordinates[0], function(coor) {
-                return {lat: coor[1], lng: coor[0]};
-            });
-            return {
-                latlngs: latlngs,
-                //stroke: false,
-                weight: 2,
-                fillColor: '#ff69b4',
-                type: 'polygon'
-            };
         });
-        var pathsNames = _.map(_.range(features.length), function(i) {
-            return "p" + i;
-        })；*/
-        //paths = _.object(pathsNames, pathsArray);
     }
     return {
         defaults: {
             maxZoom: 18,
             zoomControlPosition: 'bottomleft'
         },
-        paths: paths,
+        paths: {},
         center: {
             lat: 37,
             lng: 117,
@@ -105,91 +88,72 @@ var createLeafletMapSettings = function(geometry) {
     };
 };
 
-var setupLeafletMap = function(scope, map) {
-    console.log("setupLeafletMap");
-
-    var drawItems = scope.map.controls.edit.featureGroup;
-    /*console.log(drawItems.getLayers().length);
-    console.log("Before: ");
-    map.eachLayer(function (layer) {
-        console.log(layer);
+var setupLeafletMap = function($scope, map) {
+    map.on('layeradd', function(e) {
+        console.log('layeradd');
+        console.log(e);
     });
-    */
-/*    scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
-        map.addLayer(layer)
-    });
-*/
-
+    map.on('moveend', function(e) {
+        console.log('moveend');
+    });    
+    var drawItems = $scope.map.controls.edit.featureGroup;
     drawItems.addTo(map);
-    console.log(drawItems.getLayers().length);
+    //console.log($scope.savedItems);
+    //console.log(drawItems.getLayers().length);
     if (drawItems.getLayers().length > 0) {
+        console.log("call fitBounds");
         map.fitBounds(drawItems);
     }
-    /*
-    map.eachLayer(function (layer) {
-        if(layer.hasOwnProperty('_url')) {
-            layer.bringToBack();
-        }
-    });*/
-    //setTimeout(function(){ drawItems.addTo(map);}, 1000);
-
-    console.log("After: ");
-    map.eachLayer(function (layer) {
-        console.log(layer);
-    });
-
     map.on('draw:created', function(e) {
         var layer = e.layer;
-        scope.map.controls.edit.featureGroup.addLayer(layer);
+        drawItems.addLayer(layer);
+        $scope.savedItems.push({
+            id: layer._leaflet_id,
+            geoJSON: layer.toGeoJSON()
+        });
     });
+
+    map.on('draw:edited', function(e) {
+        var layers = e.layers;
+        layers.eachLayer(function(layer) {
+            for (var i = 0; i < $scope.savedItems.length; i++) {
+                if ($scope.savedItems[i].id == layer._leaflet_id) {
+                    $scope.savedItems[i].geoJSON = layer.toGeoJSON();
+                }
+            }
+        });
+    });
+
+    map.on('draw:deleted', function(e) {
+        var layers = e.layers;
+        layers.eachLayer(function(layer) {
+            for (var i = 0; i < $scope.savedItems.length; i++) {
+                if ($scope.savedItems[i].id == layer._leaflet_id) {
+                    $scope.savedItems.splice(i, 1);
+                }
+            }
+        });
+    });
+
     map.on('draw:editstart', function(e) {
-        scope.isEditing = true;
+        $scope.isEditing = true;
     });
     map.on('draw:editstop', function(e) {
-        scope.isEditing = false;
+        $scope.isEditing = false;
     });
     map.on('draw:deletestart', function(e) {
-        scope.isDeleting = true;
+        $scope.isDeleting = true;
     });
     map.on('draw:deletestop', function(e) {
-        scope.isDeleting = false;
+        $scope.isDeleting = false;
     });
     return map;
 };
 
 var removeLayers = function(scope, map) {
-    /*
-    console.log("before remove layers: ");
-    map.eachLayer(function (layer) {
-        console.log(layer);
-    });*/
-    map.removeLayer(scope.map.controls.edit.featureGroup);
-    /*
-    scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
-        map.removeLayer(layer)
-    });    */
-    /*
-    scope.map.controls.edit.featureGroup.eachLayer(function(layer) {
-        map.removeLayer(layer)
-    });*/
-/*
-    var removableLayers = [];
-    map.eachLayer(function (layer) {
-        map.removeLayer(layer);
-    });
-    */
-    /*    
-    for(var i=0; i<removableLayers.length; i++) {
-        map.removeLayer(removableLayers[i])
-    }*/
-    //scope.map.controls.edit.featureGroup = new L.FeatureGroup();
-    scope.map.controls.edit.featureGroup.clearLayers();
-    /*
-    console.log("After remove layers: ");
-    map.eachLayer(function (layer) {
-        console.log(layer);
-    });*/
-    //map.remove();
+    var drawItems = scope.map.controls.edit.featureGroup;
+    map.removeLayer(drawItems);
+    drawItems.clearLayers();
 };
 
 var isFieldSavable = function(scope, $ionicPopup) {
@@ -221,7 +185,8 @@ var isFieldSavable = function(scope, $ionicPopup) {
 };
 angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state', "leafletData", '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
     function($scope, $state, leafletData, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
-        $scope.map = createLeafletMapSettings();
+        $scope.savedItems = [];
+        $scope.map = createLeafletMapSettings($scope);
         var leafletMap;
         $scope.isEditing = false;
         $scope.isDeleting = false;
@@ -233,30 +198,15 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
                 var newField = {
                     name: $scope.data.newFieldName,
                     geometry: $scope.map.controls.edit.featureGroup.toGeoJSON()
-                };/*
-                newField.owner = $rootScope.currentUser._id;
-                newField.staffs = [];
-                //console.log(Fields.find().fetch());
-                $meteor.collection(Fields).save(newField).then(function(res) {
-                    //console.log(Fields.find().fetch());
-                    removeLayers($scope, leafletMap);
+                };
+                var callback = function(response) {
                     $state.transitionTo('fieldDetails', {
-                        fieldId: res[0]._id
+                        fieldId: response //res[0]._id
                     });
-                }, function(err) {
-                    console.log(err);
-                });*/
-                                    var callback = function(response) {
-                                        console.log(response);
-                                                            $state.transitionTo('fieldDetails', {
-                        fieldId: response//res[0]._id
-                    });
-
-                    };
-                    var errorback = function(err) {
-                    };
-                    $meteor.call('createField', newField).then(callback, errorback);
-                   removeLayers($scope, leafletMap);
+                };
+                var errorback = function(err) {};
+                $meteor.call('createField', newField).then(callback, errorback);
+                removeLayers($scope, leafletMap);
             }
         };
         $scope.cancel = function() {
@@ -450,7 +400,8 @@ angular.module('app.example').controller('AddFieldTabCtrl', ['$scope', '$state',
 angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state', "leafletData", '$stateParams', '$meteor', '$ionicModal', '$rootScope', '$ionicSideMenuDelegate', '$ionicPopup', '$cordovaDatePicker',
     function($scope, $state, leafletData, $stateParams, $meteor, $ionicModal, $rootScope, $ionicSideMenuDelegate, $ionicPopup, $cordovaDatePicker) {
         $scope.field = $meteor.object(Fields, $stateParams.fieldId, false);
-        $scope.map = createLeafletMapSettings($scope.field.geometry);
+        $scope.savedItems = [];
+        $scope.map = createLeafletMapSettings($scope);
         var leafletMap;
         $scope.isEditing = false;
         $scope.isDeleting = false;
@@ -461,12 +412,15 @@ angular.module('app.example').controller('EditFieldTabCtrl', ['$scope', '$state'
             if (isFieldSavable($scope, $ionicPopup)) {
                 //$scope.field.geometry = $scope.map.controls.edit.featureGroup.toGeoJSON();
                 //$scope.field.save();
-                var field = {_id: $scope.field._id, owner: $scope.field.owner, name: $scope.field.name, geometry: $scope.map.controls.edit.featureGroup.toGeoJSON()};
-                                                    var callback = function(response) {
-                    };
-                    var errorback = function(err) {
-                    };
-                    $meteor.call('createField', field).then(callback, errorback);
+                var field = {
+                    _id: $scope.field._id,
+                    owner: $scope.field.owner,
+                    name: $scope.field.name,
+                    geometry: $scope.map.controls.edit.featureGroup.toGeoJSON()
+                };
+                var callback = function(response) {};
+                var errorback = function(err) {};
+                $meteor.call('updateField', field).then(callback, errorback);
 
                 removeLayers($scope, leafletMap);
                 $state.transitionTo('fieldDetails', {

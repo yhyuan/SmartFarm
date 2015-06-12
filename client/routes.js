@@ -85,6 +85,12 @@
                   controller: 'EditFieldTabCtrl',
                   resolve: privateRoute
               })
+              .state('weather', {
+                  url: "/weather/:fieldId/:lat/:lng",
+                  templateUrl: 'client/weather/views/weather.ng.html',
+                  controller: 'WeatherCtrl',
+                  resolve: privateRoute
+              })
               /*.state('tabs.editField', {
                   url: "/editField/:fieldId",
                   views: {

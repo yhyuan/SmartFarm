@@ -8,6 +8,12 @@
     </ion-nav-buttons>
 
     <ion-content class="padding">
-        {{field.name}}
+        地块名: {{field.name}}<!--{{weather}}
+        <div ng-show="tomorrowWeather">
+	        明日: 最低气温({{tomorrowWeather.temperatureMin}}), 最高气温({{tomorrowWeather.temperatureMax}}), 降水概率({{tomorrowWeather.precipProbability}})<a class="button button-clear" href="#/weather/{{field._id}}/{{centroid.lat}}/{{centroid.lng}}">更多</a>        
+        </div>
+        <div ng-hide="tomorrowWeather">
+	        "目前暂时没有气象预报数据，请稍后再试。"        
+        </div>-->
     </ion-content>
 </ion-view>

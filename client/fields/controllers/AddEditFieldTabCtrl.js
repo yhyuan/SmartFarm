@@ -89,21 +89,39 @@ var createLeafletMapSettings = function($scope) {
 };
 
 var setupLeafletMap = function($scope, map) {
-    map.on('layeradd', function(e) {
+    /*map.on('layeradd', function(e) {
         console.log('layeradd');
         console.log(e);
     });
     map.on('moveend', function(e) {
         console.log('moveend');
-    });    
+    });*/
+/*
+    var imgm = L.tileLayer.chinaProvider('TianDiTu.Satellite.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        imga = L.tileLayer.chinaProvider('TianDiTu.Satellite.Annotion', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+    //var normal = L.layerGroup([normalm,normala]),
+    var image = L.layerGroup([imgm, imga]);
+    image.addTo(map);
+    */
     var drawItems = $scope.map.controls.edit.featureGroup;
     drawItems.addTo(map);
-    //console.log($scope.savedItems);
-    //console.log(drawItems.getLayers().length);
     if (drawItems.getLayers().length > 0) {
-        console.log("call fitBounds");
         map.fitBounds(drawItems);
     }
+    
+    console.log('eachLayer:');
+    map.eachLayer(function (layer) {
+       console.log(layer);
+    });
+    console.log(map.getPanes().overlayPane);
+    //console.log($scope.savedItems);
+    //console.log(drawItems.getLayers().length);
     map.on('draw:created', function(e) {
         var layer = e.layer;
         drawItems.addLayer(layer);
@@ -154,6 +172,7 @@ var removeLayers = function(scope, map) {
     var drawItems = scope.map.controls.edit.featureGroup;
     map.removeLayer(drawItems);
     drawItems.clearLayers();
+    //map.remove();
 };
 
 var isFieldSavable = function(scope, $ionicPopup) {

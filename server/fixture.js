@@ -55,7 +55,7 @@ Meteor.publish('Fields', function() {
 
       try {
           var response = HTTP.get(apiUrl).data;
-          console.log(response);
+          //console.log(response);
           // A successful API call returns no error 
           // but the contents from the JSON response
           if(response.status === 0) {

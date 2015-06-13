@@ -1,5 +1,14 @@
 App.setPreference('AutoHideSplashScreen' ,'true');
-//App.accessRule('http://192.168.2.123:3000/*');
+App.accessRule('http://192.168.2.15:3000/*');
+App.accessRule('http://t0.tianditu.cn/*');
+App.accessRule('http://t1.tianditu.cn/*');
+App.accessRule('http://t2.tianditu.cn/*');
+App.accessRule('http://t3.tianditu.cn/*');
+App.accessRule('http://t4.tianditu.cn/*');
+App.accessRule('http://t5.tianditu.cn/*');
+App.accessRule('http://t6.tianditu.cn/*');
+App.accessRule('http://t7.tianditu.cn/*');
+
 //$ meteor run android-device --mobile-server http://192.168.2.123:3000
 //$meteor run ios-device --mobile-server http://192.168.2.123:3000
 

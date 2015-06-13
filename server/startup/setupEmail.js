@@ -1,3 +1,4 @@
+ /*
   Meteor.startup(function() {
     smtp = {
         username: 'postmaster@sandbox632d3679920341e0998e40505390f045.mailgun.org',   // eg: server@gentlenode.com
@@ -8,4 +9,4 @@
 
       process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
    });
-  
+  */
